@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Downloads\" />
+    <Folder Include="Reports\" />
+    <Folder Include="src\Reports\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
+    <PackageReference Include="Microsoft.Playwright" Version="1.60.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+
+    <None Update="src\Reports\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="EnsureDownloadsFolderAfterBuild" AfterTargets="Build">
+    <MakeDir Directories="$(TargetDir)Downloads" />
+  </Target>
+
+  <Target Name="EnsureDownloadsFolderAfterPublish" AfterTargets="Publish">
+    <MakeDir Directories="$(PublishDir)Downloads" />
+  </Target>
+
+  <Target Name="EnsureReportsFolderAfterBuild" AfterTargets="Build">
+    <MakeDir Directories="$(TargetDir)Reports" />
+  </Target>
+
+  <Target Name="EnsureReportsFolderAfterPublish" AfterTargets="Publish">
+    <MakeDir Directories="$(PublishDir)Reports" />
+  </Target>
+
+</Project>
