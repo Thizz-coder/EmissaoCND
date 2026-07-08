@@ -17,9 +17,9 @@ namespace EmissaoCND
                 var configService = new ConfigService();
                 var config = configService.Ler();
 
-                var exitCode = Microsoft.Playwright.Program.Main(new[] { "install", "chromium" });
+                var installPlaywright = Microsoft.Playwright.Program.Main(new[] { "install", "chromium" });
 
-                if(exitCode != 0)
+                if(installPlaywright != 0)
                 {
                     throw new Exception("Falha ao instalar o chromium do playwright");
                 }
