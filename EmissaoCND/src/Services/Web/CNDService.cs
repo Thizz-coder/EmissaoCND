@@ -5,6 +5,7 @@ using Microsoft.Playwright;
 using Microsoft.Playwright;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace EmissaoCND.src.Services.Web
@@ -21,30 +22,25 @@ namespace EmissaoCND.src.Services.Web
         {
             try
             {
-                //cnpj = new string(cnpj.Where(char.IsDigit).ToArray());
                 using var playwright = await Playwright.CreateAsync();
+                string chromePath = @"C:\Program Files\Google\Chrome\Application\chrome.exe";
 
-                var perfilChrome = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "EmissaoCND",
-                    "ChromeProfile"
-                );
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = chromePath,
+                    Arguments = "--remote-debugging-port=9222 --user-data-dir=\"" +
+                Environment.ExpandEnvironmentVariables("%LOCALAPPDATA%\\EmissaoCND\\ChromeDebug") + "\"",
+                    UseShellExecute = true
+                });
 
-                var context = await playwright.Chromium.LaunchPersistentContextAsync(
-                    perfilChrome,
-                    new()
-                    {
-                        Channel = "chrome",
-                        Headless = false,
-                        AcceptDownloads = true,
-                        SlowMo = 500,
-                        Locale = "pt-BR",
-                        TimezoneId = "America/Sao_Paulo"
-                    }
-                );
+                // Aguarda alguns segundos
+                await Task.Delay(3000);
+
+                var browser = await playwright.Chromium.ConnectOverCDPAsync("http://127.0.0.1:9222");
+                var context = browser.Contexts.FirstOrDefault()
+                    ?? throw new Exception("Nenhum contexto do Chrome foi encontrado na porta 9222.");
 
                 var page = context.Pages.FirstOrDefault() ?? await context.NewPageAsync();
-
                 await page.GotoAsync(_config.UrlPortal);
                 await page.GetByRole(AriaRole.Option, new() { Name = "Pessoa Jurídica" }).ClickAsync();
                 Thread.Sleep(1000);
