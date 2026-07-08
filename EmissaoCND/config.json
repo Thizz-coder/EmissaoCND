@@ -1,5 +1,6 @@
 {
   "CaminhoExcel": "Reports\\EmissaoCND.xlsx",
+  "CaminhoPastaTemp": "C:\\Temp_EmissaoCND",
   "PastaDownload": "Downloads",
   "UrlPortal": "https://servicos.receitafederal.gov.br/servico/certidoes/#/home",
   "Headless": false

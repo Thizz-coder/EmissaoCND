@@ -21,24 +21,54 @@ namespace EmissaoCND.src.Services.Web
         {
             try
             {
-                cnpj = new string(cnpj.Where(char.IsDigit).ToArray());
+                //cnpj = new string(cnpj.Where(char.IsDigit).ToArray());
                 using var playwright = await Playwright.CreateAsync();
-                await using var browser = await playwright.Chromium.LaunchAsync(new()
-                {
-                    Headless = _config.Headless,
-                });
-                var context = await browser.NewContextAsync();
 
-                var page = await context.NewPageAsync();
+                var perfilChrome = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "EmissaoCND",
+                    "ChromeProfile"
+                );
+
+                var context = await playwright.Chromium.LaunchPersistentContextAsync(
+                    perfilChrome,
+                    new()
+                    {
+                        Channel = "chrome",
+                        Headless = false,
+                        AcceptDownloads = true,
+                        SlowMo = 500,
+                        Locale = "pt-BR",
+                        TimezoneId = "America/Sao_Paulo"
+                    }
+                );
+
+                var page = context.Pages.FirstOrDefault() ?? await context.NewPageAsync();
+
                 await page.GotoAsync(_config.UrlPortal);
                 await page.GetByRole(AriaRole.Option, new() { Name = "Pessoa Jurídica" }).ClickAsync();
+                Thread.Sleep(1000);
                 await page.GetByRole(AriaRole.Textbox, new() { Name = "CNPJ" }).FillAsync(cnpj);
+                Thread.Sleep(1000);
                 await page.GetByRole(AriaRole.Button, new() { Name = "Emitir Certidão" }).ClickAsync();
-
+                //var download = await page.RunAndWaitForDownloadAsync(async () =>
+                //{
+                //await page.GetByRole(AriaRole.Button, new() { Name = "Emitir Certidão" }).ClickAsync();
+                //});
+                Thread.Sleep(3000);
+                var fileName = $"{nomeEmpresa}_{cnpj}.pdf";
+                Directory.CreateDirectory(_config.CaminhoPastaTemp);
+                //await download.SaveAsAsync(Path.Combine(_config.CaminhoPastaTemp, fileName));
+                return new ResultadoDownloadCNDModel
+                {
+                    Sucesso = true,
+                    Erro = false,
+                    StatusExcel = "Download realizado"
+                };
             }
             catch
             {
-
+                return null;
             }
 
 

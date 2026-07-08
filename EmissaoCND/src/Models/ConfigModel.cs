@@ -10,6 +10,7 @@ namespace EmissaoCND.src.Models
     {
         public string CaminhoExcel { get; set; } = string.Empty;
         public string PastaDownload { get; set; } = string.Empty;
+        public string CaminhoPastaTemp {  get; set; } = string.Empty;
         public string UrlPortal { get; set; } = string.Empty;
         public bool Headless { get; set; }
     }
